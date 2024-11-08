@@ -1,6 +1,6 @@
 {
-  "name": "@buxuku/ai-code-reviewer",
-  "version": "1.2.2",
+  "name": "@b-yp/ai-code-reviewer",
+  "version": "1.2.3",
   "main": "index.js",
   "bin": {
     "ai-code-reviewer": "./bin/index.js"

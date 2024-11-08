@@ -1,4 +1,4 @@
-import axios, {AxiosInstance} from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
 
 export interface IGitLabConfig {
@@ -54,7 +54,7 @@ export class GitLab {
     private diffRefs: {};
     private mergeRequestInfo?: IMergeRequestInfo;
 
-    constructor({gitlabApiUrl, gitlabAccessToken, projectId, mergeRequestId}: IGitLabConfig) {
+    constructor({ gitlabApiUrl, gitlabAccessToken, projectId, mergeRequestId }: IGitLabConfig) {
         this.projectId = projectId;
         this.mrId = mergeRequestId;
         this.diffRefs = {};
@@ -76,10 +76,21 @@ export class GitLab {
     }
 
     async getMergeRequestChanges() {
-        const response = await this.apiClient.get(`/projects/${this.projectId}/merge_requests/${this.mrId}/diffs`);
-        const changes = response.data?.map((item: Record<string, any>) => {
-            const {old_line, new_line} = parseLastDiff(item.diff);
-            return {...item, old_line, new_line};
+        /**
+         * 获取合并请求改动
+         * GET /projects/:id/merge_requests/:merge_request_iid/changes
+         * 15.7版本（api v5）移除，目前最新的 api 为 /diffs，但是14版本尚未支持
+         * https://gitlab.cn/docs/jh/api/merge_requests.html#%E8%8E%B7%E5%8F%96%E5%90%88%E5%B9%B6%E8%AF%B7%E6%B1%82%E6%94%B9%E5%8A%A8
+         */
+        const response = await this.apiClient.get(`/projects/${this.projectId}/merge_requests/${this.mrId}/changes`);
+        console.log('response:', response)
+        /**
+         * 返回的数据结构也发生了变化
+         */
+        const changes = response.data?.changes?.map((item: Record<string, any>) => {
+            const { old_line, new_line } = parseLastDiff(item.diff);
+            console.log('line:', old_line, new_line)
+            return { ...item, old_line, new_line };
         });
         return changes;
     }

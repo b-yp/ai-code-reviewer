@@ -25,6 +25,7 @@ async function run() {
         mergeRequestId,
         organizationId
     } = program.opts();
+    // console.log('params:', JSON.stringify(program.opts(), null, 2))
     console.log('ai code review is underway...')
     const gitlab = new GitLab({gitlabApiUrl, gitlabAccessToken, projectId, mergeRequestId});
     const openai = new OpenAI(openaiApiUrl, openaiAccessToken, organizationId);
