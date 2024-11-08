@@ -83,13 +83,12 @@ export class GitLab {
          * https://gitlab.cn/docs/jh/api/merge_requests.html#%E8%8E%B7%E5%8F%96%E5%90%88%E5%B9%B6%E8%AF%B7%E6%B1%82%E6%94%B9%E5%8A%A8
          */
         const response = await this.apiClient.get(`/projects/${this.projectId}/merge_requests/${this.mrId}/changes`);
-        console.log('response:', response)
         /**
          * 返回的数据结构也发生了变化
          */
         const changes = response.data?.changes?.map((item: Record<string, any>) => {
             const { old_line, new_line } = parseLastDiff(item.diff);
-            console.log('line:', old_line, new_line)
+            console.log('changes line:', old_line, new_line)
             return { ...item, old_line, new_line };
         });
         return changes;

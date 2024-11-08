@@ -1,9 +1,8 @@
-import axios, {AxiosInstance} from 'axios';
-import {openAiCompletionsConfig, suggestContent, systemContent} from "./utils";
+import axios, { AxiosInstance } from 'axios';
+import { openAiCompletionsConfig, suggestContent, systemContent } from "./utils";
 
 interface ICompletion {
     messages?: { role: string, content: string }[];
-    temperature: number;
     model: string;
 }
 
@@ -12,7 +11,7 @@ export class OpenAI {
     private accessTokens: string[];
     private accessTokenIndex = 0;
 
-    constructor(private apiUrl: string, private accessToken: string, private orgId?: string) {
+    constructor(private apiUrl: string, private accessToken: string, private orgId?: string, private model?: string) {
         this.accessTokens = accessToken.split(',');
         const headers: { 'OpenAI-Organization'?: string } = {};
         if (orgId) {
@@ -28,7 +27,10 @@ export class OpenAI {
 
     async reviewCodeChange(change: string): Promise<string> {
         const newIndex = this.accessTokenIndex = (this.accessTokenIndex >= this.accessTokens.length - 1 ? 0 : this.accessTokenIndex + 1);
-        const data: ICompletion = {...openAiCompletionsConfig};
+        if (this.model) {
+            openAiCompletionsConfig.model = this.model;
+        }
+        const data: ICompletion = { ...openAiCompletionsConfig };
         data.messages = [
             systemContent,
             suggestContent,
@@ -43,6 +45,7 @@ export class OpenAI {
                 'Authorization': `Bearer ${this.accessTokens[newIndex]}`
             }
         });
+        console.log('reviewCodeChange response:', response)
         return response.data.choices?.[0]?.message?.content;
     }
 }

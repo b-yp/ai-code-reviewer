@@ -12,6 +12,7 @@ program
     .option('-a, --openai-access-token <string>', 'OpenAI Access Token')
     .option('-p, --project-id <number>', 'GitLab Project ID')
     .option('-m, --merge-request-id <string>', 'GitLab Merge Request ID')
+    .option('-mo, --model <string>', 'model', 'gpt-3.5-turbo')
     .option('-org, --organization-id <number>', 'organization ID')
     .parse(process.argv);
 
@@ -23,12 +24,13 @@ async function run() {
         openaiAccessToken,
         projectId,
         mergeRequestId,
-        organizationId
+        organizationId,
+        model
     } = program.opts();
     // console.log('params:', JSON.stringify(program.opts(), null, 2))
     console.log('ai code review is underway...')
     const gitlab = new GitLab({gitlabApiUrl, gitlabAccessToken, projectId, mergeRequestId});
-    const openai = new OpenAI(openaiApiUrl, openaiAccessToken, organizationId);
+    const openai = new OpenAI(openaiApiUrl, openaiAccessToken, organizationId, model);
     await gitlab.init().catch(() => {
         console.log('gitlab init error')
     });
